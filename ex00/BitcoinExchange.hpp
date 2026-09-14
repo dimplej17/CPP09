@@ -14,9 +14,7 @@ class BitcoinExchange
 	private:
 	std::map<std::string, float> _database;
 
-	// Helper validation functions
-	bool isValidDate(const std::string& date) const;
-	bool isValidValue(const std::string& valueStr, float& value) const;
+	bool _isValidDate(const std::string& date) const;
 
 	public:
 	BitcoinExchange();

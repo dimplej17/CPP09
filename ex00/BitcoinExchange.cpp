@@ -1,7 +1,24 @@
 
 #include "BitcoinExchange.hpp"
 
-bool BitcoinExchange::isValidDate(const std::string& date) const
+BitcoinExchange::BitcoinExchange() {}
+
+BitcoinExchange::~BitcoinExchange() {}
+
+BitcoinExchange::BitcoinExchange(const BitcoinExchange& src)
+{
+	this->_database = src._database;
+}
+
+BitcoinExchange& BitcoinExchange::operator=(const BitcoinExchange& src)
+{
+	if (this != &src)
+		this->_database = src._database;
+
+	return *this;
+}
+
+bool BitcoinExchange::_isValidDate(const std::string& date) const
 {
 	if (date.length() != 10 || date[4] != '-' || date[7] != '-')
 		return false;
@@ -19,8 +36,10 @@ bool BitcoinExchange::isValidDate(const std::string& date) const
 	if (month == 2)
 	{
 		bool isLeap = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
-		if (isLeap && day > 29) return false;
-		if (!isLeap && day > 28) return false;
+		if (isLeap && day > 29)
+			return false;
+		if (!isLeap && day > 28)
+			return false;
 	}
 	return true;
 }
@@ -65,7 +84,8 @@ void BitcoinExchange::evaluateInput(const std::string& inputPath)
 
 	while (std::getline(file, line))
 	{
-		if (line.empty()) continue;
+		if (line.empty())
+			continue;
 
 		size_t delim = line.find('|');
 		if (delim == std::string::npos)
@@ -74,15 +94,21 @@ void BitcoinExchange::evaluateInput(const std::string& inputPath)
 			continue;
 		}
 
-		// Clean up whitespace around the pipe
+		// Clean up whitespace around |
 		std::string date = line.substr(0, delim);
 		std::string valStr = line.substr(delim + 1);
 		
-		// Trim spaces helper logic goes here...
+		// Trim spaces
 		date.erase(date.find_last_not_of(" \t\r\n") + 1);
 		valStr.erase(0, valStr.find_first_not_of(" \t\r\n"));
 
-		if (!isValidDate(date))
+		if (valStr.empty())
+		{
+			std::cout << "Error: bad input => " << line << std::endl;
+			continue;
+		}
+
+		if (!_isValidDate(date))
 		{
 			std::cout << "Error: bad input => " << date << std::endl;
 			continue;
@@ -106,24 +132,19 @@ void BitcoinExchange::evaluateInput(const std::string& inputPath)
 			continue;
 		}
 
-		// --- The lower_bound Search Matrix ---
+		// lower bound Search Matrix
 		std::map<std::string, float>::const_iterator it = _database.lower_bound(date);
 		
-		if (it != _database.end() && it->first == date)
-		{
-			// Found exact match
+		if (it != _database.end() && it->first == date)	// Found exact match
 			std::cout << date << " => " << val << " = " << (val * it->second) << std::endl;
-		} 
 		else
 		{
-			// Not exact match, lower_bound gave us the upper/next date. Move back by 1 element.
+			// Not exact match, lower bound gives the upper/next date, move back by 1 element
 			if (it == _database.begin())
-			{
 				std::cout << "Error: date is older than any record in database => " << date << std::endl;
-			} 
 			else
 			{
-				--it; // Steps back safely to the lower date
+				--it; // step back to lower date
 				std::cout << date << " => " << val << " = " << (val * it->second) << std::endl;
 			}
 		}
