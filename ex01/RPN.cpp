@@ -6,17 +6,17 @@
 /*   By: djanardh <djanardh@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/14 17:54:07 by djanardh          #+#    #+#             */
-/*   Updated: 2026/09/14 18:04:43 by djanardh         ###   ########.fr       */
+/*   Updated: 2026/09/15 02:18:36 by djanardh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RPN.hpp"
 
-RPN::RPN() {}
+RPN::RPN() : _stack() {}
 
 RPN::RPN(const RPN& src)
 {
-	*this = src;
+	this->_stack = src._stack;
 }
 
 RPN& RPN::operator=(const RPN& src)

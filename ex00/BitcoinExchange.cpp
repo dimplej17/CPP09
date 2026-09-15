@@ -6,15 +6,13 @@
 /*   By: djanardh <djanardh@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/14 17:42:32 by djanardh          #+#    #+#             */
-/*   Updated: 2026/09/14 17:42:34 by djanardh         ###   ########.fr       */
+/*   Updated: 2026/09/15 02:25:23 by djanardh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "BitcoinExchange.hpp"
 
-BitcoinExchange::BitcoinExchange() {}
-
-BitcoinExchange::~BitcoinExchange() {}
+BitcoinExchange::BitcoinExchange() : _database() {}
 
 BitcoinExchange::BitcoinExchange(const BitcoinExchange& src)
 {
@@ -28,6 +26,8 @@ BitcoinExchange& BitcoinExchange::operator=(const BitcoinExchange& src)
 
 	return *this;
 }
+
+BitcoinExchange::~BitcoinExchange() {}
 
 bool BitcoinExchange::_isValidDate(const std::string& date) const
 {
