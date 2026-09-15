@@ -96,16 +96,19 @@ void PmergeMe::execute(int argc, char** argv)
 {
 	std::vector<PmergeMe::Element> input_vector = _parseInputToVector(argc, argv);
 
-	// .........
+	std::cout << "UNSORTED Sequence: ";
+	for (size_t i = 0; i < input_vector.size(); ++i)
+		std::cout << input_vector[i].value << " ";
+	std::cout << std::endl;
 
-	
-	
+	std::vector<Element> sorted_vector = _sortVector(input_vector);
 
+	std::cout << "SORTED Sequence:  ";
+	for (size_t i = 0; i < sorted_vector.size(); ++i)
+		std::cout << sorted_vector[i].value << " ";
+	std::cout << std::endl;
+	
 	// TO-DO: LATER ALLIGATOR
-	// On the first line you must display an explicit text followed by the unsorted positive
-	// integer sequence.
-	// On the second line you must display an explicit text followed by the sorted positive
-	// integer sequence.
 	// On the third line, you must display an explicit message indicating the time taken
 	// by your algorithm, specifying the first container used to sort the positive integer
 	// sequence.
