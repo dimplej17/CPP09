@@ -16,6 +16,12 @@ class PmergeMe
 		std::vector<Element> sub_elements;
 	};
 
+	struct ElementPair
+	{
+		Element main_elem; // larger element - main_chain
+		Element pend_elem; // smaller element - pend
+	};
+
 	PmergeMe();
 	PmergeMe(const PmergeMe& src);
 	PmergeMe& operator=(const PmergeMe& src);
@@ -25,10 +31,11 @@ class PmergeMe
 
 	private:
 	std::vector<int> _rawVector;
-	double _vectorTime;
+	// double _vectorTime;
 
 	std::vector<Element> _parseInputToVector(int argc, char** argv);
-	std::vector<Element> _sortVector(std::vector<Element>& input_vec);
+	std::vector<Element> _fordJohnsonSort(std::vector<Element>& input_vec);
+	size_t _binarySearch(const std::vector<Element>& chain, const Element& target, size_t right_bound);
 		
 	bool _isValidNumber(const char* str) const;
 };
