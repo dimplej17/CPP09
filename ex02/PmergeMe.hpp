@@ -5,6 +5,8 @@
 #include <vector>
 #include <cstdlib> // For std::strtol
 #include <climits> // For INT_MAX
+#include <ctime>
+#include <iomanip>
 
 class PmergeMe
 {
@@ -30,9 +32,6 @@ class PmergeMe
 	void execute(int argc, char** argv);
 
 	private:
-	std::vector<int> _rawVector;
-	// double _vectorTime;
-
 	std::vector<Element> _parseInputToVector(int argc, char** argv);
 	std::vector<Element> _fordJohnsonSort(std::vector<Element>& input_vec);
 	size_t _binarySearch(const std::vector<Element>& chain, const Element& target, size_t right_bound);

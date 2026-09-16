@@ -1,17 +1,16 @@
 
 #include "PmergeMe.hpp"
 
-PmergeMe::PmergeMe() : _rawVector() {}
+PmergeMe::PmergeMe() {}
 
 PmergeMe::PmergeMe(const PmergeMe& src)
 {
-	this->_rawVector = src._rawVector;
+	(void)src;
 }
 
 PmergeMe& PmergeMe::operator=(const PmergeMe& src)
 {
-	if (this != &src)
-		this->_rawVector = src._rawVector;
+	(void)src;
 	return *this;
 }
 
@@ -211,12 +210,20 @@ void PmergeMe::execute(int argc, char** argv)
 		std::cout << input_vec[i].value << " ";
 	std::cout << std::endl;
 
+	std::clock_t start_clock = std::clock();
 	std::vector<Element> sorted_vector = _fordJohnsonSort(input_vec);
+	std::clock_t end_clock = std::clock();
+
+	double time_taken = static_cast<double>(end_clock - start_clock) / CLOCKS_PER_SEC * 1000000.0;
 
 	std::cout << "SORTED Sequence:  ";
 	for (size_t i = 0; i < sorted_vector.size(); ++i)
 		std::cout << sorted_vector[i].value << " ";
 	std::cout << std::endl;
+
+	std::cout << std::fixed << std::setprecision(5);
+	std::cout << "Time taken to sort " << input_vec.size() 
+			<< " elements with std::vector container : " << time_taken << " us" << std::endl;
 	
 	// TO-DO: LATER ALLIGATOR
 	// On the third line, you must display an explicit message indicating the time taken
