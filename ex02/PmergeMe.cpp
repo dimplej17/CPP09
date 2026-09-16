@@ -151,12 +151,6 @@ std::vector<PmergeMe::Element> PmergeMe::_fordJohnsonSort(std::vector<PmergeMe::
 	// Recursive call
 	std::vector<Element> sorted_main_chain = _fordJohnsonSort(next_level_input);
 
-	// ---- PHASE 3: INSERTION (UNWINDING) ----
-	// 1. Initialize your final chain for this level with the sorted_main_chain.
-	// 2. Extract the pend elements from the sorted_main_chain's sub_elements.
-	// 3. Insert them back into sorted_main_chain using the Jacobsthal insertion sequence via binary search.
-	// 4. If has_leftover is true, insert the leftover element at the very end via binary search.
-
 	// Insertion
 	std::vector<Element> pend;
 
