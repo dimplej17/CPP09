@@ -6,7 +6,7 @@
 /*   By: djanardh <djanardh@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/16 13:52:24 by djanardh          #+#    #+#             */
-/*   Updated: 2026/09/16 15:29:59 by djanardh         ###   ########.fr       */
+/*   Updated: 2026/09/17 15:28:09 by djanardh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,26 @@ bool PmergeMe::_isValidNumber(const char* str) const
 		str++;
 	}
 	return true;
+}
+
+std::vector<size_t> PmergeMe::_generateJacobsthalSequence(size_t maxLimit)
+{
+	std::vector<size_t> jseq;
+	jseq.push_back(0); // J_0 = 0
+	jseq.push_back(1); // J_1 = 1
+
+	// Generate values based on the last J value, not loop count!!
+	while (jseq.back() < maxLimit)
+	{
+		size_t next_jn = jseq[jseq.size() - 1] + 2 * jseq[jseq.size() - 2];
+		jseq.push_back(next_jn);
+	}
+
+	// erase 0 and first 1
+	if (jseq.size() > 2)
+		jseq.erase(jseq.begin(), jseq.begin() + 2);
+
+	return jseq;
 }
 
 //////////// VECTOR ////////////
@@ -172,17 +192,18 @@ std::vector<PmergeMe::Element> PmergeMe::_fordJohnsonSortVector(std::vector<Pmer
 		pend.push_back(sorted_main_chain[i].backpack.back()); // partner is the last element inside the backpack vector
 		sorted_main_chain[i].backpack.pop_back(); // remove it when done
 	}
-
+	
+	// freebie insertion
 	sorted_main_chain.insert(sorted_main_chain.begin(), pend[0]);
 
-	size_t jacob[] = {1, 3, 5, 11, 21, 43, 85, 171, 341, 683, 1365, 2731, 5461, 10923, 21845, 43691, 87381};
+	std::vector<size_t> jacob = _generateJacobsthalSequence(pend.size());
 	size_t last_inserted = 1; // pend[0] is done, so index 1 is next to be evaluated
 
-	for (size_t j = 1; j < 13; ++j)
+	for (size_t j = 1; j < jacob.size(); ++j)
 	{
 		size_t target_idx = jacob[j] - 1; // Convert Jacobsthal number to 0-based array index
 		
-		// If the Jacobsthal index is beyond our pend size, cap it at the last element
+		// If the Jacobsthal index is beyond pend size, cap it at the last element
 		if (target_idx >= pend.size())
 			target_idx = pend.size() - 1;
 
@@ -197,7 +218,7 @@ std::vector<PmergeMe::Element> PmergeMe::_fordJohnsonSortVector(std::vector<Pmer
 			sorted_main_chain.insert(sorted_main_chain.begin() + insert_pos, pend[i]);
 			
 			if (i == last_inserted)
-				break; // Prevent underflow wrap-around with size_t
+				break;
 		}
 		
 		last_inserted = target_idx + 1;
@@ -318,10 +339,10 @@ std::deque<PmergeMe::Element> PmergeMe::_fordJohnsonSortDeque(std::deque<Element
 
 	sorted_main_chain.insert(sorted_main_chain.begin(), pend[0]);
 
-	size_t jacob[] = {1, 3, 5, 11, 21, 43, 85, 171, 341, 683, 1365, 2731, 5461, 10923, 21845, 43691, 87381};
+	std::vector<size_t> jacob = _generateJacobsthalSequence(pend.size());
 	size_t last_inserted = 1;
 
-	for (size_t j = 1; j < 13; ++j)
+	for (size_t j = 1; j < jacob.size(); ++j)
 	{
 		size_t target_idx = jacob[j] - 1;
 		if (target_idx >= pend.size())

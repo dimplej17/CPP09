@@ -6,7 +6,7 @@
 /*   By: djanardh <djanardh@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/16 13:52:31 by djanardh          #+#    #+#             */
-/*   Updated: 2026/09/16 15:28:48 by djanardh         ###   ########.fr       */
+/*   Updated: 2026/09/17 14:00:25 by djanardh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,8 @@ class PmergeMe
 	void execute(int argc, char** argv);
 
 	private:
+	std::vector<size_t> _generateJacobsthalSequence(size_t max_limit);
+	
 	std::vector<Element> _parseInputToVector(int argc, char** argv);
 	std::vector<Element> _fordJohnsonSortVector(std::vector<Element>& input_vec);
 	size_t _binarySearchVector(const std::vector<Element>& chain, const Element& target, size_t right_bound);
