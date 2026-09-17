@@ -6,7 +6,7 @@
 /*   By: djanardh <djanardh@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/16 13:52:24 by djanardh          #+#    #+#             */
-/*   Updated: 2026/09/17 15:28:09 by djanardh         ###   ########.fr       */
+/*   Updated: 2026/09/17 15:33:37 by djanardh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,7 +203,7 @@ std::vector<PmergeMe::Element> PmergeMe::_fordJohnsonSortVector(std::vector<Pmer
 	{
 		size_t target_idx = jacob[j] - 1; // Convert Jacobsthal number to 0-based array index
 		
-		// If the Jacobsthal index is beyond pend size, cap it at the last element
+		// If the Jacobsthal index is beyond pend size, cap it at the last element in pend
 		if (target_idx >= pend.size())
 			target_idx = pend.size() - 1;
 
