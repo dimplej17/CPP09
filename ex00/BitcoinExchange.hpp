@@ -6,7 +6,7 @@
 /*   By: djanardh <djanardh@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/14 17:42:43 by djanardh          #+#    #+#             */
-/*   Updated: 2026/09/14 17:42:44 by djanardh         ###   ########.fr       */
+/*   Updated: 2026/09/30 14:57:13 by djanardh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ class BitcoinExchange
 	std::map<std::string, float> _database;
 
 	bool _isValidDate(const std::string& date) const;
-
+	bool _isValidValue(const std::string& s);
 	public:
 	BitcoinExchange();
 	BitcoinExchange(const BitcoinExchange& src);

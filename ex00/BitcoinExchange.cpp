@@ -6,7 +6,7 @@
 /*   By: djanardh <djanardh@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/14 17:42:32 by djanardh          #+#    #+#             */
-/*   Updated: 2026/09/15 02:25:23 by djanardh         ###   ########.fr       */
+/*   Updated: 2026/09/30 14:58:28 by djanardh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,14 @@ bool BitcoinExchange::_isValidDate(const std::string& date) const
 	if (date.length() != 10 || date[4] != '-' || date[7] != '-')
 		return false;
 
+	for (size_t i = 0; i < date.length(); ++i)
+	{
+		if (i == 4 || i == 7)
+			continue;
+		if (!std::isdigit(static_cast<unsigned char>(date[i])))
+			return false;
+	}
+	
 	int year = std::atoi(date.substr(0, 4).c_str());
 	int month = std::atoi(date.substr(5, 2).c_str());
 	int day = std::atoi(date.substr(8, 2).c_str());
@@ -53,6 +61,21 @@ bool BitcoinExchange::_isValidDate(const std::string& date) const
 			return false;
 	}
 	return true;
+}
+
+bool BitcoinExchange::_isValidValue(const std::string& s)
+{
+	if (s.empty()) return false;
+	size_t i = 0;
+	if (s[i] == '-' || s[i] == '+') ++i;
+	bool digits = false, dot = false;
+	for (; i < s.length(); ++i)
+	{
+		if (std::isdigit(static_cast<unsigned char>(s[i]))) digits = true;
+		else if (s[i] == '.' && !dot) dot = true;
+		else return false;
+	}
+	return digits;
 }
 
 bool BitcoinExchange::loadDatabase(const std::string& dbPath)
@@ -125,6 +148,12 @@ void BitcoinExchange::evaluateInput(const std::string& inputPath)
 			continue;
 		}
 
+		if (!_isValidValue(valStr))
+		{
+			std::cout << "Error: bad input => " << valStr << std::endl;
+			continue;
+		}
+
 		char* endptr;
 		double val = std::strtod(valStr.c_str(), &endptr);
 		if (*endptr != '\0' && !std::isspace(*endptr))
@@ -134,12 +163,12 @@ void BitcoinExchange::evaluateInput(const std::string& inputPath)
 		}
 		if (val < 0)
 		{
-			std::cout << "Error: not a positive number." << std::endl;
+			std::cout << "Error: not a positive number" << std::endl;
 			continue;
 		}
 		if (val > 1000)
 		{
-			std::cout << "Error: too large a number." << std::endl;
+			std::cout << "Error: too large a number" << std::endl;
 			continue;
 		}
 
