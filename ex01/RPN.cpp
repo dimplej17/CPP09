@@ -6,23 +6,23 @@
 /*   By: djanardh <djanardh@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/14 17:54:07 by djanardh          #+#    #+#             */
-/*   Updated: 2026/09/15 02:18:36 by djanardh         ###   ########.fr       */
+/*   Updated: 2026/09/30 14:33:01 by djanardh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RPN.hpp"
 
-RPN::RPN() : _stack() {}
+RPN::RPN() : _list() {}
 
 RPN::RPN(const RPN& src)
 {
-	this->_stack = src._stack;
+	this->_list = src._list;
 }
 
 RPN& RPN::operator=(const RPN& src)
 {
 	if (this != &src)
-		this->_stack = src._stack;
+		this->_list = src._list;
 	return *this;
 }
 
@@ -35,17 +35,17 @@ bool RPN::_isOperator(char c) const
 
 bool RPN::_performOperation(char op)
 {
-	// An operation requires at least two numbers inside the stack
-	if (_stack.size() < 2)
+	// An operation requires at least two numbers inside the list
+	if (_list.size() < 2)
 		return false;
 
 	// The first popped element is the RIGHT operand (b)
-	int b = _stack.top();
-	_stack.pop();
+	int b = _list.back();
+	_list.pop_back();
 
 	// The second popped element is the LEFT operand (a)
-	int a = _stack.top();
-	_stack.pop();
+	int a = _list.back();
+	_list.pop_back();
 
 	int result = 0;
 	if (op == '+')
@@ -64,7 +64,7 @@ bool RPN::_performOperation(char op)
 		result = a / b;
 	}
 
-	_stack.push(result);
+	_list.push_back(result);
 	return true;
 }
 
@@ -79,7 +79,7 @@ void RPN::calculate(const std::string& expression)
 			continue;
 
 		if (std::isdigit(c)) // Convert character digit ('0'-'9') to integer value
-			_stack.push(c - '0');
+			_list.push_back(c - '0');
 		else if (_isOperator(c))
 		{
 			if (!_performOperation(c))
@@ -96,11 +96,11 @@ void RPN::calculate(const std::string& expression)
 	}
 
 	// only one final result should remain
-	if (_stack.size() != 1)
+	if (_list.size() != 1)
 	{
-		std::cerr << "Error: more than 1 number remaining in the stack" << std::endl;
+		std::cerr << "Error: more than 1 number remaining in the list" << std::endl;
 		return;
 	}
 
-	std::cout << _stack.top() << std::endl;
+	std::cout << _list.back() << std::endl;
 }

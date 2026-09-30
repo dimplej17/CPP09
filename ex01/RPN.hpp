@@ -6,7 +6,7 @@
 /*   By: djanardh <djanardh@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/14 17:54:12 by djanardh          #+#    #+#             */
-/*   Updated: 2026/09/14 17:54:14 by djanardh         ###   ########.fr       */
+/*   Updated: 2026/09/30 14:27:02 by djanardh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,14 @@
 #define RPN_HPP
 
 #include <iostream>
-#include <stack>
+#include <list>
 #include <string>
 #include <sstream>
 
 class RPN
 {
 	private:
-	std::stack<int> _stack;
+	std::list<int> _list;
 
 	bool _isOperator(char c) const;
 	bool _performOperation(char op);
