@@ -6,7 +6,7 @@
 /*   By: djanardh <djanardh@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/16 13:52:24 by djanardh          #+#    #+#             */
-/*   Updated: 2026/09/17 15:33:37 by djanardh         ###   ########.fr       */
+/*   Updated: 2026/10/01 10:51:35 by djanardh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,17 +142,17 @@ std::vector<PmergeMe::Element> PmergeMe::_fordJohnsonSortVector(std::vector<Pmer
 	// BASE CASE: If the vector has 0 or 1 element, it's already sorted
 	if (input_vec.size() <= 1)
 		return input_vec;
-
+ 
 	std::vector<ElementPair> pairs;
 	Element leftover;
-	bool has_leftover = false; // check for even/odd in input_vec 
-
+	bool has_leftover = false;
+ 
 	// Group input_vec into pairs
-	for (size_t i = 0; i < input_vec.size(); i += 2) {
+	for (size_t i = 0; i < input_vec.size(); i += 2)
+	{
 		if (i + 1 < input_vec.size())
 		{
 			ElementPair p;
-			// Compare and assign larger to main_elem, smaller to pend_elem
 			if (input_vec[i].value > input_vec[i + 1].value)
 			{
 				p.main_elem = input_vec[i];
@@ -171,7 +171,7 @@ std::vector<PmergeMe::Element> PmergeMe::_fordJohnsonSortVector(std::vector<Pmer
 			has_leftover = true;
 		}
 	}
-
+ 
 	std::vector<Element> mainChainVector;
 	// Attach pend_elem to main_elem's backpack (so that the paired partners can be tracked with main_elem)
 	for (size_t i = 0; i < pairs.size(); ++i)
@@ -179,26 +179,28 @@ std::vector<PmergeMe::Element> PmergeMe::_fordJohnsonSortVector(std::vector<Pmer
 		pairs[i].main_elem.backpack.push_back(pairs[i].pend_elem);
 		mainChainVector.push_back(pairs[i].main_elem);
 	}
-
+ 
 	// Recursive call
 	std::vector<Element> sorted_main_chain = _fordJohnsonSortVector(mainChainVector);
-
+ 
 	// Insertion
 	std::vector<Element> pend;
-
-	// get partner from each element in sorted main_chain
+ 
+	std::vector<size_t> partner_pos;
+ 
 	for (size_t i = 0; i < sorted_main_chain.size(); ++i)
 	{
-		pend.push_back(sorted_main_chain[i].backpack.back()); // partner is the last element inside the backpack vector
-		sorted_main_chain[i].backpack.pop_back(); // remove it when done
+		pend.push_back(sorted_main_chain[i].backpack.back());
+		sorted_main_chain[i].backpack.pop_back();
+		partner_pos.push_back(i + 1); // +1 'coz pend[0] is about to be inserted at the front
 	}
 	
 	// freebie insertion
 	sorted_main_chain.insert(sorted_main_chain.begin(), pend[0]);
-
+ 
 	std::vector<size_t> jacob = _generateJacobsthalSequence(pend.size());
 	size_t last_inserted = 1; // pend[0] is done, so index 1 is next to be evaluated
-
+ 
 	for (size_t j = 1; j < jacob.size(); ++j)
 	{
 		size_t target_idx = jacob[j] - 1; // Convert Jacobsthal number to 0-based array index
@@ -206,16 +208,20 @@ std::vector<PmergeMe::Element> PmergeMe::_fordJohnsonSortVector(std::vector<Pmer
 		// If the Jacobsthal index is beyond pend size, cap it at the last element in pend
 		if (target_idx >= pend.size())
 			target_idx = pend.size() - 1;
-
+ 
 		// Insert backward from target_idx down to last_inserted
 		for (size_t i = target_idx; i >= last_inserted; --i)
 		{
-			// Find where its original partner is currently sitting in sorted_main_chain
-			size_t right_bound = sorted_main_chain.size();
-
-			size_t insert_pos = _binarySearchVector(sorted_main_chain, pend[i], right_bound);
-			
+			size_t insert_pos = _binarySearchVector(sorted_main_chain, pend[i], partner_pos[i]);
+ 
 			sorted_main_chain.insert(sorted_main_chain.begin() + insert_pos, pend[i]);
+ 
+			// Everything at or after insert_pos moved one slot to the right
+			for (size_t k = 0; k < partner_pos.size(); ++k)
+			{
+				if (partner_pos[k] >= insert_pos)
+					++partner_pos[k];
+			}
 			
 			if (i == last_inserted)
 				break;
@@ -230,8 +236,8 @@ std::vector<PmergeMe::Element> PmergeMe::_fordJohnsonSortVector(std::vector<Pmer
 		size_t insert_pos = _binarySearchVector(sorted_main_chain, leftover, sorted_main_chain.size());
 		sorted_main_chain.insert(sorted_main_chain.begin() + insert_pos, leftover);
 	}
-
-
+ 
+ 
 	return sorted_main_chain;
 }
 
@@ -292,11 +298,11 @@ std::deque<PmergeMe::Element> PmergeMe::_fordJohnsonSortDeque(std::deque<Element
 {
 	if (input_deq.size() <= 1)
 		return input_deq;
-
+ 
 	std::deque<ElementPair> pairs;
 	Element leftover;
 	bool has_leftover = false;
-
+ 
 	for (size_t i = 0; i < input_deq.size(); i += 2)
 	{
 		if (i + 1 < input_deq.size())
@@ -320,39 +326,46 @@ std::deque<PmergeMe::Element> PmergeMe::_fordJohnsonSortDeque(std::deque<Element
 			has_leftover = true;
 		}
 	}
-
+ 
 	std::deque<Element> mainChainDeque;
 	for (size_t i = 0; i < pairs.size(); ++i)
 	{
 		pairs[i].main_elem.backpack.push_back(pairs[i].pend_elem);
 		mainChainDeque.push_back(pairs[i].main_elem);
 	}
-
+ 
 	std::deque<Element> sorted_main_chain = _fordJohnsonSortDeque(mainChainDeque);
-
+ 
 	std::deque<Element> pend;
+	std::deque<size_t> partner_pos; // current index of each pend element's main partner
 	for (size_t i = 0; i < sorted_main_chain.size(); ++i)
 	{
 		pend.push_back(sorted_main_chain[i].backpack.back());
 		sorted_main_chain[i].backpack.pop_back();
+		partner_pos.push_back(i + 1); // +1: pend[0] is about to be inserted at the front
 	}
-
+ 
 	sorted_main_chain.insert(sorted_main_chain.begin(), pend[0]);
-
+ 
 	std::vector<size_t> jacob = _generateJacobsthalSequence(pend.size());
 	size_t last_inserted = 1;
-
+ 
 	for (size_t j = 1; j < jacob.size(); ++j)
 	{
 		size_t target_idx = jacob[j] - 1;
 		if (target_idx >= pend.size())
 			target_idx = pend.size() - 1;
-
+ 
 		for (size_t i = target_idx; i >= last_inserted; --i)
 		{
-			size_t right_bound = sorted_main_chain.size();
-			size_t insert_pos = _binarySearchDeque(sorted_main_chain, pend[i], right_bound);
+			size_t insert_pos = _binarySearchDeque(sorted_main_chain, pend[i], partner_pos[i]);
 			sorted_main_chain.insert(sorted_main_chain.begin() + insert_pos, pend[i]);
+ 
+			for (size_t k = 0; k < partner_pos.size(); ++k)
+			{
+				if (partner_pos[k] >= insert_pos)
+					++partner_pos[k];
+			}
 			
 			if (i == last_inserted)
 				break;
@@ -362,16 +375,15 @@ std::deque<PmergeMe::Element> PmergeMe::_fordJohnsonSortDeque(std::deque<Element
 		if (last_inserted >= pend.size())
 			break;
 	}
-
+ 
 	if (has_leftover)
 	{
 		size_t insert_pos = _binarySearchDeque(sorted_main_chain, leftover, sorted_main_chain.size());
 		sorted_main_chain.insert(sorted_main_chain.begin() + insert_pos, leftover);
 	}
-
+ 
 	return sorted_main_chain;
 }
-
 
 void PmergeMe::execute(int argc, char** argv)
 {

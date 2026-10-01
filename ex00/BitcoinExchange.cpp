@@ -6,7 +6,7 @@
 /*   By: djanardh <djanardh@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/14 17:42:32 by djanardh          #+#    #+#             */
-/*   Updated: 2026/09/30 14:58:28 by djanardh         ###   ########.fr       */
+/*   Updated: 2026/10/01 11:00:48 by djanardh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,15 @@ BitcoinExchange& BitcoinExchange::operator=(const BitcoinExchange& src)
 }
 
 BitcoinExchange::~BitcoinExchange() {}
+
+std::string BitcoinExchange::_trim(const std::string& s)
+{
+	size_t start = s.find_first_not_of(" \t\r\n");
+	if (start == std::string::npos)
+		return ""; // string was empty or only whitespace
+	size_t end = s.find_last_not_of(" \t\r\n");
+	return s.substr(start, end - start + 1);
+}
 
 bool BitcoinExchange::_isValidDate(const std::string& date) const
 {
@@ -81,26 +90,56 @@ bool BitcoinExchange::_isValidValue(const std::string& s)
 bool BitcoinExchange::loadDatabase(const std::string& dbPath)
 {
 	std::ifstream file(dbPath.c_str());
-	if (!file.is_open()) {
+	if (!file.is_open())
+	{
 		std::cerr << "Error: could not open database file" << std::endl;
 		return false;
 	}
-
+ 
+	_database.clear();
+ 
 	std::string line;
-	std::getline(file, line); // Skip header line
-
+	bool firstLine = true;
+ 
 	while (std::getline(file, line))
 	{
-		size_t delim = line.find(',');
-		if (delim != std::string::npos)
+		line = _trim(line);
+ 
+		// Skip the header only if it really is the header
+		if (firstLine)
 		{
-			std::string date = line.substr(0, delim);
-			std::string rateStr = line.substr(delim + 1);
-			float rate = std::atof(rateStr.c_str());
-			_database[date] = rate; // Insert into map
+			firstLine = false;
+			if (line == "date,exchange_rate")
+				continue;
 		}
+ 
+		if (line.empty())
+			continue;
+ 
+		size_t delim = line.find(',');
+		if (delim == std::string::npos)
+		{
+			std::cerr << "Error: invalid database line => " << line << std::endl;
+			return false;
+		}
+ 
+		std::string date = _trim(line.substr(0, delim));
+		std::string rateStr = _trim(line.substr(delim + 1));
+ 
+		if (!_isValidDate(date) || !_isValidValue(rateStr) || rateStr[0] == '-')
+		{
+			std::cerr << "Error: invalid database line => " << line << std::endl;
+			return false;
+		}
+ 
+		_database[date] = std::strtod(rateStr.c_str(), NULL);
 	}
-	file.close();
+ 
+	if (_database.empty())
+	{
+		std::cerr << "Error: database is empty" << std::endl;
+		return false;
+	}
 	return true;
 }
 
@@ -113,12 +152,24 @@ void BitcoinExchange::evaluateInput(const std::string& inputPath)
 		return;
 	}
 
+	std::cout << std::setprecision(10);
+
 	std::string line;
-	std::getline(file, line); // Skip "date | value" header
+	bool firstLine = true;
+	bool sawAnyLine = false;
 
 	while (std::getline(file, line))
 	{
-		if (line.empty())
+		sawAnyLine = true;
+
+		if (firstLine)
+		{
+			firstLine = false;
+			if (_trim(line) == "date | value")
+				continue;
+		}
+
+		if (_trim(line).empty())
 			continue;
 
 		size_t delim = line.find('|');
@@ -128,66 +179,56 @@ void BitcoinExchange::evaluateInput(const std::string& inputPath)
 			continue;
 		}
 
-		// Clean up whitespace around |
-		std::string date = line.substr(0, delim);
-		std::string valStr = line.substr(delim + 1);
-		
-		// Trim spaces
-		date.erase(date.find_last_not_of(" \t\r\n") + 1);
-		valStr.erase(0, valStr.find_first_not_of(" \t\r\n"));
+		std::string date = _trim(line.substr(0, delim));
+		std::string valStr = _trim(line.substr(delim + 1));
 
 		if (valStr.empty())
 		{
 			std::cout << "Error: bad input => " << line << std::endl;
 			continue;
 		}
-
 		if (!_isValidDate(date))
 		{
 			std::cout << "Error: bad input => " << date << std::endl;
 			continue;
 		}
-
 		if (!_isValidValue(valStr))
 		{
 			std::cout << "Error: bad input => " << valStr << std::endl;
 			continue;
 		}
 
-		char* endptr;
-		double val = std::strtod(valStr.c_str(), &endptr);
-		if (*endptr != '\0' && !std::isspace(*endptr))
-		{
-			std::cout << "Error: bad input => " << valStr << std::endl;
-			continue;
-		}
+		double val = std::strtod(valStr.c_str(), NULL);
 		if (val < 0)
 		{
-			std::cout << "Error: not a positive number" << std::endl;
+			std::cout << "Error: not a positive number." << std::endl;
 			continue;
 		}
 		if (val > 1000)
 		{
-			std::cout << "Error: too large a number" << std::endl;
+			std::cout << "Error: too large a number." << std::endl;
 			continue;
 		}
 
-		// lower bound Search Matrix
-		std::map<std::string, float>::const_iterator it = _database.lower_bound(date);
-		
-		if (it != _database.end() && it->first == date)	// Found exact match
+		std::map<std::string, double>::const_iterator it = _database.lower_bound(date);
+
+		if (it != _database.end() && it->first == date)
 			std::cout << date << " => " << val << " = " << (val * it->second) << std::endl;
 		else
 		{
-			// Not exact match, lower bound gives the upper/next date, move back by 1 element
 			if (it == _database.begin())
 				std::cout << "Error: date is older than any record in database => " << date << std::endl;
 			else
 			{
-				--it; // step back to lower date
+				--it;
 				std::cout << date << " => " << val << " = " << (val * it->second) << std::endl;
 			}
 		}
 	}
+
+	if (!sawAnyLine)
+		std::cout << "Error: input file is empty." << std::endl;
+
 	file.close();
 }
+
