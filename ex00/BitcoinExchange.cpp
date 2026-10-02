@@ -6,7 +6,7 @@
 /*   By: djanardh <djanardh@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/14 17:42:32 by djanardh          #+#    #+#             */
-/*   Updated: 2026/10/01 11:00:48 by djanardh         ###   ########.fr       */
+/*   Updated: 2026/10/02 12:18:09 by djanardh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,8 +151,6 @@ void BitcoinExchange::evaluateInput(const std::string& inputPath)
 		std::cerr << "Error: could not open file." << std::endl;
 		return;
 	}
-
-	std::cout << std::setprecision(10);
 
 	std::string line;
 	bool firstLine = true;
