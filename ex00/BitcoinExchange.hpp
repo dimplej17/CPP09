@@ -6,7 +6,7 @@
 /*   By: djanardh <djanardh@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/14 17:42:43 by djanardh          #+#    #+#             */
-/*   Updated: 2026/09/30 15:27:18 by djanardh         ###   ########.fr       */
+/*   Updated: 2026/10/02 12:15:58 by djanardh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <fstream>
 #include <sstream>
 #include <cstdlib>
+#include <iomanip>
 
 class BitcoinExchange
 {
